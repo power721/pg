@@ -2,4 +2,5 @@
 
 PACKAGE=$(ls -t ~/Downloads/Telegram\ Desktop/pg.*.zip | head -1)
 cp "$PACKAGE" pg.zip
-ls "$PACKAGE" | awk -F/ '{print $NF}' | tee >version.txt
+ls "$PACKAGE" | awk -F/ '{print $NF}' | awk -F. '{print $2}' | tee >version.txt
+cat version.txt
