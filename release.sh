@@ -3,7 +3,10 @@
 old_version=$(cat version.txt)
 PACKAGE=$(ls -t ~/Downloads/Telegram\ Desktop/pg.*.zip | head -1)
 mv "$PACKAGE" pg.zip
-new_version=$(ls "$PACKAGE" | awk -F/ '{print $NF}' | awk -F. '{print $2}')
+new_version=$(echo "$PACKAGE" | awk -F/ '{print $NF}' | awk -F. '{print $2}')
+if [ "${new_version}" = "" ]; then
+  exit
+fi
 echo "old version: ${old_version}  new version: ${new_version}"
 
 if [ "${old_version}" != "${new_version}" ]; then
