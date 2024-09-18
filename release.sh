@@ -8,7 +8,7 @@ echo "old version: ${old_version}  new version: ${new_version}"
 
 if [ "${old_version}" != "${new_version}" ]; then
   echo "${new_version}" >version.txt
-  cat "commit"
+  echo "commit"
 
   git commit -am "update $(cat version.txt)"
   git push
