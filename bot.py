@@ -1,8 +1,10 @@
 import os
+import re
+import subprocess
 from telegram.ext import Application, MessageHandler, filters
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
-MAX_FILE_SIZE = 20 * 1024 * 1024
+MAX_FILE_SIZE = 50 * 1024 * 1024
 DOWNLOAD_FOLDER = 'downloads'
 
 async def downloader(update, context):
@@ -18,9 +20,24 @@ async def downloader(update, context):
             await update.message.reply_text("Sorry, the file is too large to download (max 20MB).")
             print(f"File {file_name} exceeds size limit. Skipping download.")
         else:
-            # Download the file if within size limits
-            file = await context.bot.get_file(message.document)
-            await file.download_to_drive(os.path.join(DOWNLOAD_FOLDER, file_name))
+            match = re.match(r'pg\.(\d{8})-(\d{4}).zip', file_name)
+            if match:
+                subprocess.call(["git", "pull"])
+                f = open("version.txt", "r")
+                old_version = int(f.read().replace("-", ""))
+                new_version = int (match.group(1) + match.group(2))
+                print(f"Old version: {old_version} New version: {new_version}")
+                if new_version > old_version:
+                    file = await context.bot.get_file(message.document)
+                    await file.download_to_drive(os.path.join(DOWNLOAD_FOLDER, file_name))
+                    with open("version.txt", "w") as text_file:
+                        version = f"{match.group(1)}-{match.group(2)}"
+                        text_file.write(version)
+                        subprocess.call(["git", "commit", "-am", f"update {version}"])
+                        subprocess.call(["git", "push", "origin", "main"])
+                        subprocess.call(["git", "push", "lab", "main"])
+            else:
+                print(f'Ignore file {file_name}')
 
 def main() -> None:
     os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
