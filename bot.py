@@ -1,52 +1,65 @@
 import os
 import re
 import subprocess
-from telegram.ext import Application, MessageHandler, filters
+from telethon import TelegramClient, events
 
-BOT_TOKEN = os.getenv('BOT_TOKEN')
-MAX_FILE_SIZE = 50 * 1024 * 1024
+# Environment variables
+API_ID = os.getenv('API_ID')  # Your API ID (from my.telegram.org)
+API_HASH = os.getenv('API_HASH')  # Your API Hash (from my.telegram.org)
+BOT_TOKEN = os.getenv('BOT_TOKEN')  # Bot token from BotFather
+MAX_FILE_SIZE = 50 * 1024 * 1024  # Max file size 50MB
 DOWNLOAD_FOLDER = 'downloads'
 
-async def downloader(update, context):
-    message = update.message
-    if message.document:
-        file_id = message.document.file_id
-        file_name = message.document.file_name
-        file_size = message.document.file_size
+# Initialize the TelegramClient
+client = TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN)
 
-        print(f"Received file: {file_name} with file ID: {file_id} and size: {file_size} bytes")
+# Create the download folder if it doesn't exist
+os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
+
+
+@client.on(events.NewMessage)
+async def downloader(event):
+    message = event.message
+    if message.document:
+        file_name = message.document.attributes[0].file_name
+        file_size = message.document.size
+
+        print(f"Received file: {file_name} with size: {file_size} bytes")
+
         # Check if file exceeds the size limit
         if file_size > MAX_FILE_SIZE:
-            await update.message.reply_text("Sorry, the file is too large to download (max 20MB).")
+            await message.reply("Sorry, the file is too large to download (max 20MB).")
             print(f"File {file_name} exceeds size limit. Skipping download.")
         else:
             match = re.match(r'pg\.(\d{8})-(\d{4}).zip', file_name)
             if match:
                 subprocess.call(["git", "pull"])
-                f = open("version.txt", "r")
-                old_version = int(f.read().replace("-", ""))
-                new_version = int (match.group(1) + match.group(2))
+                with open("version.txt", "r") as f:
+                    old_version = int(f.read().replace("-", ""))
+                new_version = int(match.group(1) + match.group(2))
+
                 print(f"Old version: {old_version} New version: {new_version}")
+
                 if new_version > old_version:
-                    file = await context.bot.get_file(message.document)
-                    await file.download_to_drive(os.path.join(DOWNLOAD_FOLDER, file_name))
+                    # Download the file to the specified folder
+                    file_path = os.path.join(DOWNLOAD_FOLDER, file_name)
+                    await client.download_media(message, file_path)
+
                     with open("version.txt", "w") as text_file:
                         version = f"{match.group(1)}-{match.group(2)}"
                         text_file.write(version)
+
+                        # Git operations: commit, push
                         subprocess.call(["git", "commit", "-am", f"update {version}"])
                         subprocess.call(["git", "push", "origin", "main"])
                         subprocess.call(["git", "push", "lab", "main"])
+                else:
+                    print(f"Ignoring file {file_name}, new version is not greater than old version.")
             else:
-                print(f'Ignore file {file_name}')
+                print(f"Ignoring file {file_name}, does not match version pattern.")
 
-def main() -> None:
-    os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
-    application = Application.builder().token(BOT_TOKEN).build()
 
-    application.add_handler(MessageHandler(filters.Document.ALL, downloader))
-
-    print("run_polling")
-    application.run_polling()
-
+# Run the bot
 if __name__ == '__main__':
-    main()
+    print("Bot is running...")
+    client.run_until_disconnected()
