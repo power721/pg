@@ -14,6 +14,6 @@ if [ "${old_version}" != "${new_version}" ]; then
   echo "commit file"
 
   git commit -am "update $(cat version.txt)"
-  git push origin main
   git push lab main
+  git push origin main
 fi
