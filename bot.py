@@ -20,11 +20,12 @@ os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 @client.on(events.NewMessage)
 async def downloader(event):
     message = event.message
+    if message.chat is None:
+        return
     channel_name = message.chat.title
     channel_id = message.chat.id
-    print(f"channel: {channel_id} {channel_name}")
-    #if channel_id == 2046444460 and message.document:
-    if message.document:
+    print(f"From: {channel_id} {channel_name}")
+    if channel_id == 2046444460 and message.document:
         file_name = message.file.name
         mime_type = message.document.mime_type
         file_size = message.document.size
@@ -33,7 +34,6 @@ async def downloader(event):
 
         # Check if file exceeds the size limit
         if file_size > MAX_FILE_SIZE:
-            await message.reply("Sorry, the file is too large to download (max 100MB).")
             print(f"File {file_name} exceeds size limit. Skipping download.")
         else:
             match = re.match(r'pg\.(\d{8})-(\d{4}).zip', file_name)
