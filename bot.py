@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+import shutil
 from telethon import TelegramClient, events
 
 # Environment variables
@@ -10,7 +11,7 @@ MAX_FILE_SIZE = 100 * 1024 * 1024  # Max file size 100MB
 DOWNLOAD_FOLDER = 'downloads'
 
 # Initialize the TelegramClient
-client = TelegramClient('bot', API_ID, API_HASH)
+client = TelegramClient("bot", API_ID, API_HASH)
 
 # Create the download folder if it doesn't exist
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
@@ -22,11 +23,13 @@ async def downloader(event):
     channel_name = message.chat.title
     channel_id = message.chat.id
     print(f"channel: {channel_id} {channel_name}")
+    #if channel_id == 2046444460 and message.document:
     if message.document:
-        file_name = message.document.attributes[0].file_name
+        file_name = message.file.name
+        mime_type = message.document.mime_type
         file_size = message.document.size
 
-        print(f"Received file: {file_name} with size: {file_size} bytes")
+        print(f"Received file: {mime_type} {file_name} with size: {file_size} bytes")
 
         # Check if file exceeds the size limit
         if file_size > MAX_FILE_SIZE:
@@ -46,6 +49,7 @@ async def downloader(event):
                     # Download the file to the specified folder
                     file_path = os.path.join(DOWNLOAD_FOLDER, file_name)
                     await client.download_media(message, file_path)
+                    shutil.move(file_path, "./pg.zip")
 
                     with open("version.txt", "w") as text_file:
                         version = f"{match.group(1)}-{match.group(2)}"
