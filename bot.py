@@ -21,8 +21,6 @@ os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 @client.on(events.NewMessage(chats=channels))
 async def downloader(event):
     message = event.message
-    if message.chat is None:
-        return
     channel_name = message.chat.title
     channel_id = message.chat.id
     print(f"From: {channel_id} {channel_name}")
