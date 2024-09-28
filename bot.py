@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 import subprocess
@@ -14,6 +15,9 @@ channels = [2046444460, 2188783347]
 # Initialize the TelegramClient
 client = TelegramClient("bot", API_ID, API_HASH)
 
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Create the download folder if it doesn't exist
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
@@ -23,17 +27,17 @@ async def downloader(event):
     message = event.message
     channel_name = message.chat.title
     channel_id = message.chat.id
-    print(f"From: {channel_id} {channel_name}")
+    logger.info(f"From: {channel_id} {channel_name}")
     if message.document:
         file_name = message.file.name
         mime_type = message.document.mime_type
         file_size = message.document.size
 
-        print(f"Received file: {mime_type} {file_name} with size: {file_size} bytes")
+        logger.info(f"Received file: {mime_type} {file_name} with size: {file_size} bytes")
 
         # Check if file exceeds the size limit
         if file_size > MAX_FILE_SIZE:
-            print(f"File {file_name} exceeds size limit. Skipping download.")
+            logger.info(f"File {file_name} exceeds size limit. Skipping download.")
         else:
             match = re.match(r'pg\.(\d{8})-(\d{4}).zip', file_name)
             if match:
@@ -42,7 +46,7 @@ async def downloader(event):
                     old_version = int(f.read().replace("-", ""))
                 new_version = int(match.group(1) + match.group(2))
 
-                print(f"Old version: {old_version} New version: {new_version}")
+                logger.info(f"Old version: {old_version} New version: {new_version}")
 
                 if new_version > old_version:
                     # Download the file to the specified folder
@@ -59,13 +63,13 @@ async def downloader(event):
                         subprocess.call(["git", "push", "origin", "main"])
                         subprocess.call(["git", "push", "lab", "main"])
                 else:
-                    print(f"Ignoring file {file_name}, new version is not greater than old version.")
+                    logger.info(f"Ignoring file {file_name}, new version is not greater than old version.")
             else:
-                print(f"Ignoring file {file_name}, does not match version pattern.")
+                logger.info(f"Ignoring file {file_name}, does not match version pattern.")
 
 
 # Run the bot
 if __name__ == '__main__':
-    print("Bot is running...")
+    logger.info("Bot is running...")
     client.start()
     client.run_until_disconnected()
