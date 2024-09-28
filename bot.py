@@ -6,12 +6,11 @@ from telethon import TelegramClient, events
 # Environment variables
 API_ID = os.getenv('API_ID')  # Your API ID (from my.telegram.org)
 API_HASH = os.getenv('API_HASH')  # Your API Hash (from my.telegram.org)
-BOT_TOKEN = os.getenv('BOT_TOKEN')  # Bot token from BotFather
-MAX_FILE_SIZE = 50 * 1024 * 1024  # Max file size 50MB
+MAX_FILE_SIZE = 100 * 1024 * 1024  # Max file size 100MB
 DOWNLOAD_FOLDER = 'downloads'
 
 # Initialize the TelegramClient
-client = TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN)
+client = TelegramClient('bot', API_ID, API_HASH)
 
 # Create the download folder if it doesn't exist
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
@@ -20,6 +19,9 @@ os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 @client.on(events.NewMessage)
 async def downloader(event):
     message = event.message
+    channel_name = message.chat.title
+    channel_id = message.chat.id
+    print(f"channel: {channel_id} {channel_name}")
     if message.document:
         file_name = message.document.attributes[0].file_name
         file_size = message.document.size
@@ -28,7 +30,7 @@ async def downloader(event):
 
         # Check if file exceeds the size limit
         if file_size > MAX_FILE_SIZE:
-            await message.reply("Sorry, the file is too large to download (max 20MB).")
+            await message.reply("Sorry, the file is too large to download (max 100MB).")
             print(f"File {file_name} exceeds size limit. Skipping download.")
         else:
             match = re.match(r'pg\.(\d{8})-(\d{4}).zip', file_name)
@@ -62,4 +64,5 @@ async def downloader(event):
 # Run the bot
 if __name__ == '__main__':
     print("Bot is running...")
+    client.start()
     client.run_until_disconnected()
