@@ -10,6 +10,7 @@ API_HASH = os.getenv('API_HASH')  # Your API Hash (from my.telegram.org)
 MAX_FILE_SIZE = 100 * 1024 * 1024  # Max file size 100MB
 DOWNLOAD_FOLDER = 'downloads'
 
+channels = [2046444460, 2188783347]
 # Initialize the TelegramClient
 client = TelegramClient("bot", API_ID, API_HASH)
 
@@ -17,7 +18,7 @@ client = TelegramClient("bot", API_ID, API_HASH)
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
 
-@client.on(events.NewMessage)
+@client.on(events.NewMessage(chats=channels))
 async def downloader(event):
     message = event.message
     if message.chat is None:
@@ -25,7 +26,7 @@ async def downloader(event):
     channel_name = message.chat.title
     channel_id = message.chat.id
     print(f"From: {channel_id} {channel_name}")
-    if channel_id == 2046444460 and message.document:
+    if message.document:
         file_name = message.file.name
         mime_type = message.document.mime_type
         file_size = message.document.size
