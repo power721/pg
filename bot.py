@@ -59,13 +59,38 @@ async def downloader(event):
                         text_file.write(version)
 
                         # Git operations: commit, push
-                        subprocess.call(["git", "commit", "-am", f"update {version}"])
+                        subprocess.call(["git", "commit", "-am", f"update PG {version}"])
                         subprocess.call(["git", "push", "origin", "main"])
                         subprocess.call(["git", "push", "lab", "main"])
                 else:
                     logger.info(f"Ignoring file {file_name}, new version is not greater than old version.")
             else:
-                logger.info(f"Ignoring file {file_name}, does not match version pattern.")
+                match = re.match(r'真心(\d{8}).zip', file_name)
+                if match:
+                    subprocess.call(["git", "pull"])
+                    with open("version1.txt", "r") as f:
+                        old_version = int(f.read())
+                    new_version = int(match.group(1))
+
+                    logger.info(f"Old version: {old_version} New version: {new_version}")
+
+                    if new_version > old_version:
+                        # Download the file to the specified folder
+                        file_path = os.path.join(DOWNLOAD_FOLDER, file_name)
+                        await client.download_media(message, file_path)
+                        shutil.move(file_path, "./heart.zip")
+
+                        with open("version1.txt", "w") as text_file:
+                            text_file.write(str(new_version))
+
+                            # Git operations: commit, push
+                            subprocess.call(["git", "commit", "-am", f"update {new_version}"])
+                            subprocess.call(["git", "push", "origin", "main"])
+                            subprocess.call(["git", "push", "lab", "main"])
+                    else:
+                        logger.info(f"Ignoring file {file_name}, new version is not greater than old version.")
+                else:
+                    logger.info(f"Ignoring file {file_name}, does not match version pattern.")
 
 
 # Run the bot
