@@ -12,7 +12,6 @@ echo "old version: ${old_version}  new version: ${new_version}"
 if [ "${old_version}" != "${new_version}" ]; then
   echo "${new_version}" >version.txt
   echo "commit file"
-  unzip pg.zip lib/tokentemplate.json -d ~/workspace/alist-tvbox/src/main/resources
 
   git commit -am "update $(cat version.txt)"
   git push lab main
