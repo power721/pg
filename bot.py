@@ -53,7 +53,7 @@ async def downloader(event):
                     # Download the file to the specified folder
                     file_path = os.path.join(DOWNLOAD_FOLDER, file_name)
                     await client.download_media(message, file_path)
-                    shutil.move(file_path, "./pg.zip")
+                    shutil.move(file_path, "pg.zip")
 
                     with open("version.txt", "w") as text_file:
                         version = f"{match.group(1)}-{match.group(2)}"
@@ -61,8 +61,8 @@ async def downloader(event):
 
                         # Git operations: commit, push
                         subprocess.call(["git", "commit", "-am", f"update PG {version}"])
-                        subprocess.call(["git", "push", "origin", "main"])
                         subprocess.call(["git", "push", "lab", "main"])
+                        subprocess.call(["git", "push", "origin", "main"])
                 else:
                     logger.info(f"Ignoring file {file_name}, new version is not greater than old version.")
             else:
@@ -80,15 +80,15 @@ async def downloader(event):
                         # Download the file to the specified folder
                         file_path = os.path.join(DOWNLOAD_FOLDER, file_name)
                         await client.download_media(message, file_path)
-                        shutil.move(file_path, "./heart.zip")
+                        shutil.move(file_path, "heart.zip")
 
                         with open("version1.txt", "w") as text_file:
                             text_file.write(str(new_version))
 
                             # Git operations: commit, push
                             subprocess.call(["git", "commit", "-am", f"update {new_version}"])
-                            subprocess.call(["git", "push", "origin", "main"])
                             subprocess.call(["git", "push", "lab", "main"])
+                            subprocess.call(["git", "push", "origin", "main"])
                     else:
                         logger.info(f"Ignoring file {file_name}, new version is not greater than old version.")
                 else:
