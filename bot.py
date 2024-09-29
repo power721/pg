@@ -42,9 +42,11 @@ async def downloader(event):
             match = re.match(r'pg\.(\d{8})-(\d{4}).zip', file_name)
             if match:
                 subprocess.call(["git", "pull", "lab", "main"])
-                old_version = 0
                 with open("version.txt", "r") as f:
-                    old_version = int(f.read().replace("-", ""))
+                    try:
+                        old_version = int(f.read().replace("-", ""))
+                    except ValueError:
+                        old_version = 0
                 new_version = int(match.group(1) + match.group(2))
 
                 logger.info(f"Old version: {old_version} New version: {new_version}")
@@ -69,9 +71,11 @@ async def downloader(event):
                 match = re.match(r'真心(\d{8}).zip', file_name)
                 if match:
                     subprocess.call(["git", "pull", "lab", "main"])
-                    old_version = 0
                     with open("version1.txt", "r") as f:
-                        old_version = int(f.read())
+                        try:
+                            old_version = int(f.read())
+                        except ValueError:
+                            old_version = 0
                     new_version = int(match.group(1))
 
                     logger.info(f"Old version: {old_version} New version: {new_version}")
