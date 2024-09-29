@@ -53,7 +53,7 @@ async def downloader(event):
                     # Download the file to the specified folder
                     file_path = os.path.join(DOWNLOAD_FOLDER, file_name)
                     await client.download_media(message, file_path)
-                    shutil.move(file_path, "pg.zip")
+                    subprocess.call(["mv", file_path, "pg.zip"])
 
                     with open("version.txt", "w") as text_file:
                         version = f"{match.group(1)}-{match.group(2)}"
@@ -80,7 +80,7 @@ async def downloader(event):
                         # Download the file to the specified folder
                         file_path = os.path.join(DOWNLOAD_FOLDER, file_name)
                         await client.download_media(message, file_path)
-                        shutil.move(file_path, "heart.zip")
+                        subprocess.call(["mv", file_path, "heart.zip"])
 
                         with open("version1.txt", "w") as text_file:
                             text_file.write(str(new_version))
