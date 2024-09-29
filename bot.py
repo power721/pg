@@ -61,8 +61,8 @@ async def downloader(event):
 
                         # Git operations: commit, push
                         subprocess.call(["git", "commit", "-am", f"update PG {version}"])
-                        subprocess.call(["git", "push", "lab", "main"])
                         subprocess.call(["git", "push", "origin", "main"])
+                        subprocess.call(["git", "push", "hub", "main"])
                 else:
                     logger.info(f"Ignoring file {file_name}, new version is not greater than old version.")
             else:
@@ -87,8 +87,8 @@ async def downloader(event):
 
                             # Git operations: commit, push
                             subprocess.call(["git", "commit", "-am", f"update {new_version}"])
-                            subprocess.call(["git", "push", "lab", "main"])
                             subprocess.call(["git", "push", "origin", "main"])
+                            subprocess.call(["git", "push", "hub", "main"])
                     else:
                         logger.info(f"Ignoring file {file_name}, new version is not greater than old version.")
                 else:
