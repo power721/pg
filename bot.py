@@ -22,7 +22,7 @@ TOKEN = os.getenv("GITHUB_TOKEN")
 MAX_FILE_SIZE = 200 * 1024 * 1024  # Max file size 200MB
 DOWNLOAD_FOLDER = 'downloads'
 
-channels = [2046444460, 2188783347, 1890409212, 1734222246]
+channels = [2046444460, 2188783347, 1943841872, 1890409212, 1734222246]
 PG_JAR_GROUP = 1943841872
 VERSION_FILE = 'pg.version'
 # monitored files in PG_JAR_GROUP: {downloaded filename: path inside the pg zip}
