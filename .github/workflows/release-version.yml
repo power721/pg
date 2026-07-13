@@ -4,13 +4,39 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
   notify:
     runs-on: ubuntu-latest
 
     steps:
       - name: Call version API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ github.event.release.tag_name }}"
+          EXPECTED="pg.${VERSION}.zip"
+          REPO="${{ github.repository }}"
+
+          # The release is published the instant it is created, but the
+          # pg.<version>.zip asset is uploaded a moment later — so poll for it.
+          # This also covers releases the bot rolled back (deleted) on upload
+          # failure: the asset never appears and we skip the version push.
+          FOUND=0
+          for i in $(seq 1 12); do
+            if gh api "repos/${REPO}/releases/tags/${VERSION}" --jq '.assets[].name' 2>/dev/null | grep -qxF "$EXPECTED"; then
+              FOUND=1
+              break
+            fi
+            echo "asset '${EXPECTED}' not present yet; retrying ($i/12)..."
+            sleep 5
+          done
+
+          if [ "$FOUND" -ne 1 ]; then
+            echo "::notice::Release ${VERSION} has no '${EXPECTED}' asset; not pushing version."
+            exit 0
+          fi
 
           curl -X GET "${{ secrets.VERSION_API }}?type=pg&version=${VERSION}"
