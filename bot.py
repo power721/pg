@@ -33,6 +33,7 @@ VERSION_FILE = 'pg.version'
 PACKAGE_FILES = {
     'pg.jar': 'pg.jar',
     'aliproxy.tar.xz': 'lib/aliproxy.tar.xz',
+    'allinone.tar.xz': 'lib/allinone.tar.xz',
 }
 # Initialize the TelegramClient
 client = TelegramClient("bot", API_ID, API_HASH)

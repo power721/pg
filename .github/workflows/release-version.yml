@@ -25,7 +25,7 @@ jobs:
           # This also covers releases the bot rolled back (deleted) on upload
           # failure: the asset never appears and we skip the version push.
           FOUND=0
-          for i in $(seq 1 12); do
+          for i in $(seq 1 120); do
             if gh api "repos/${REPO}/releases/tags/${VERSION}" --jq '.assets[].name' 2>/dev/null | grep -qxF "$EXPECTED"; then
               FOUND=1
               break
