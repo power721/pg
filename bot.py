@@ -26,7 +26,7 @@ UPLOAD_RETRIES = 3
 ALBUM_DEBOUNCE = 3.0  # seconds to wait for all files in an album before building one combined release
 DOWNLOAD_FOLDER = 'downloads'
 
-channels = [2046444460, 2188783347, 1943841872, 1890409212, 1734222246]
+channels = [2046444460, 2216673883, 2188783347, 1943841872, 1890409212, 1734222246]
 PG_JAR_GROUP = 1943841872
 VERSION_FILE = 'pg.version'
 # monitored files in PG_JAR_GROUP: {downloaded filename: path inside the pg zip}
