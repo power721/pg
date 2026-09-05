@@ -298,33 +298,33 @@ async def downloader(event):
                 save_latest(file_name, new_version)
             elif os.path.exists(tmp_path):
                 os.remove(tmp_path)
+            return
 
-        else:
-            # 真心20250406-增量包.zip
-            match = re.match(r'真心(\d{8})-?(\d)?-?增量包.zip', file_name)
-            if match:
-                new_version = datetime.now().strftime("%Y%m%d-%H%M")
-                logger.info(f"New version: {new_version}")
-                new_file = f"zx{new_version}.zip"
+        # 真心20250406-增量包.zip
+        match = re.match(r'真心(\d{8})-?(\d)?-?增量包.zip', file_name)
+        if match:
+            new_version = datetime.now().strftime("%Y%m%d-%H%M")
+            logger.info(f"New version: {new_version}")
+            new_file = f"zx{new_version}.zip"
 
-                await client.download_media(message, new_file)
-                release(new_file, new_version, "ZX")
-                os.remove(new_file)
+            await client.download_media(message, new_file)
+            release(new_file, new_version, "ZX")
+            os.remove(new_file)
+            return
 
-            else:
-                # 真心20250402-全量包.zip
-                # match = re.match(r'真心(\d{8})-?(\d)?-(全量包|完整包).zip', file_name)
-                # if match:
-                #     new_version = datetime.now().strftime("%Y%m%d-%H%M")
-                #     logger.info(f"New version: {new_version}")
-                #     new_file = f"zx-{new_version}.zip"
-                #
-                #     await client.download_media(message, "zx.base.zip")
-                #     commit(new_file, "zx.base.zip")
-                #
-                # else:
-                #     logger.info(f"Ignoring file {file_name}, does not match version pattern.")
-                logger.info(f"Ignoring file {file_name}, does not match version pattern.")
+        # zx20250406.zip
+        match = re.match(r'zx(\d{8})-?(\d)?.zip', file_name)
+        if match:
+            new_version = datetime.now().strftime("%Y%m%d-%H%M")
+            logger.info(f"New version: {new_version}")
+            new_file = f"zx{new_version}.zip"
+
+            await client.download_media(message, new_file)
+            release(new_file, new_version, "ZX")
+            os.remove(new_file)
+            return
+
+        logger.info(f"Ignoring file {file_name}, does not match version pattern.")
 
 
 # Album buffering: collect files posted together into one combined release.
